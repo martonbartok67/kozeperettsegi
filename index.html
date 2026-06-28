@@ -11,12 +11,30 @@
       --muted: #4d5662;
       --line: #d8dde5;
       --page: #eef5f7;
-      --surface: #ffffff;
+      --surface: rgba(255, 255, 255, 0.94);
+      --card: #ffffff;
+      --glass: rgba(255, 255, 255, 0.68);
       --shadow: 0 24px 70px rgba(30, 39, 55, 0.18);
       --soft-shadow: 0 10px 24px rgba(30, 39, 55, 0.1);
       --green: #2d8f83;
       --blue: #2d77a8;
       --red: #9d4b3e;
+    }
+
+    [data-theme="dark"] {
+      color-scheme: dark;
+      --ink: #f7efe2;
+      --muted: #c5b9aa;
+      --line: rgba(255, 255, 255, 0.16);
+      --page: #17130f;
+      --surface: rgba(35, 29, 24, 0.92);
+      --card: #251f1a;
+      --glass: rgba(47, 39, 32, 0.68);
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+      --soft-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
+      --green: #5dbbab;
+      --blue: #72aee0;
+      --red: #d07767;
     }
 
     * {
@@ -33,9 +51,16 @@
     body {
       background:
         radial-gradient(circle at 22% 12%, rgba(255, 255, 255, 0.88), transparent 28%),
-        linear-gradient(180deg, #f8fbfc 0%, var(--page) 45%, #e9f2f4 100%);
+        linear-gradient(180deg, #f8fbfc 0%, var(--page) 48%, #e9f2f4 100%);
       color: var(--ink);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      transition: background 220ms ease, color 220ms ease;
+    }
+
+    [data-theme="dark"] body {
+      background:
+        radial-gradient(circle at 18% 8%, rgba(157, 75, 62, 0.22), transparent 30%),
+        linear-gradient(180deg, #17130f 0%, #221a15 54%, #120f0d 100%);
     }
 
     button,
@@ -43,9 +68,14 @@
       font: inherit;
     }
 
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
     .app-shell {
       min-height: 100vh;
       padding: clamp(18px, 4vw, 48px);
+      transition: padding 220ms ease;
     }
 
     .browser-window {
@@ -57,20 +87,23 @@
       max-width: 1120px;
       min-height: calc(100vh - clamp(36px, 8vw, 96px));
       overflow: hidden;
+      transition: border-radius 220ms ease, max-width 220ms ease, min-height 220ms ease;
     }
 
     .browser-top {
       align-items: center;
-      background: rgba(255, 255, 255, 0.94);
+      background: var(--surface);
       border-bottom: 1px solid var(--line);
       display: grid;
-      gap: 18px;
-      grid-template-columns: auto auto minmax(160px, 260px) 1fr auto;
+      gap: 12px;
+      grid-template-columns: auto auto 1fr auto auto;
       min-height: 54px;
       padding: 10px 18px;
       position: sticky;
       top: 0;
       z-index: 10;
+      backdrop-filter: blur(18px);
+      transition: opacity 180ms ease, transform 180ms ease;
     }
 
     .window-dots {
@@ -96,9 +129,11 @@
       background: #52c46b;
     }
 
-    .home-link {
+    .home-link,
+    .utility-button,
+    .mini-menu button {
       background: transparent;
-      border: 0;
+      border: 1px solid transparent;
       border-radius: 7px;
       color: var(--ink);
       cursor: pointer;
@@ -108,39 +143,13 @@
     }
 
     .home-link:hover,
-    .home-link:focus-visible {
-      background: #f1f5f7;
-      outline: none;
-    }
-
-    .search-wrap {
-      position: relative;
-    }
-
-    .search-wrap::before {
-      color: #8a95a3;
-      content: "⌕";
-      font-size: 1rem;
-      left: 12px;
-      line-height: 1;
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-
-    .search-input {
-      background: #ffffff;
-      border: 1px solid #cfd6df;
-      border-radius: 7px;
-      color: var(--ink);
-      min-height: 34px;
-      padding: 7px 10px 7px 32px;
-      width: 100%;
-    }
-
-    .search-input:focus {
-      border-color: #7fa9b5;
-      box-shadow: 0 0 0 3px rgba(45, 143, 131, 0.16);
+    .home-link:focus-visible,
+    .utility-button:hover,
+    .utility-button:focus-visible,
+    .mini-menu button:hover,
+    .mini-menu button:focus-visible {
+      background: rgba(127, 169, 181, 0.12);
+      border-color: var(--line);
       outline: none;
     }
 
@@ -152,27 +161,42 @@
 
     .mini-menu button {
       --tone: var(--green);
-      background: #ffffff;
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      color: var(--ink);
-      cursor: pointer;
+      background: var(--card);
+      border-color: var(--line);
       font-size: 0.88rem;
-      font-weight: 760;
-      min-height: 34px;
-      padding: 7px 10px;
-    }
-
-    .mini-menu button:hover,
-    .mini-menu button:focus-visible {
-      border-color: var(--tone);
-      outline: none;
+      white-space: nowrap;
     }
 
     .mini-menu button[aria-current="page"] {
       background: var(--tone);
       border-color: var(--tone);
       color: #ffffff;
+    }
+
+    .top-tools {
+      display: flex;
+      gap: 8px;
+    }
+
+    .focus-button {
+      display: none;
+    }
+
+    .focus-exit {
+      background: #101827;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 8px;
+      bottom: 18px;
+      box-shadow: var(--shadow);
+      color: #ffffff;
+      cursor: pointer;
+      display: none;
+      font-weight: 800;
+      min-height: 42px;
+      padding: 10px 14px;
+      position: fixed;
+      right: 18px;
+      z-index: 20;
     }
 
     .active-badge {
@@ -203,10 +227,22 @@
 
     .hero {
       background:
-        linear-gradient(90deg, rgba(255, 255, 255, 0.96), rgba(241, 248, 250, 0.9)),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.84), rgba(241, 248, 250, 0.72)),
         linear-gradient(135deg, rgba(45, 143, 131, 0.08), rgba(45, 119, 168, 0.06));
-      border-bottom: 1px solid #e2e8ef;
-      padding: clamp(42px, 7vw, 74px) clamp(34px, 7vw, 78px) clamp(38px, 5vw, 54px);
+      border-bottom: 1px solid var(--line);
+      display: grid;
+      gap: 24px;
+      padding: clamp(40px, 7vw, 76px) clamp(28px, 7vw, 78px) clamp(34px, 5vw, 54px);
+    }
+
+    [data-theme="dark"] .hero {
+      background:
+        linear-gradient(90deg, rgba(37, 31, 26, 0.88), rgba(31, 35, 38, 0.72)),
+        linear-gradient(135deg, rgba(93, 187, 171, 0.12), rgba(208, 119, 103, 0.1));
+    }
+
+    .hero-copy {
+      max-width: 760px;
     }
 
     .hero h1 {
@@ -214,22 +250,87 @@
       letter-spacing: 0;
       line-height: 0.95;
       margin: 0 0 14px;
-      max-width: 840px;
     }
 
     .hero p {
-      color: #101827;
+      color: var(--ink);
       font-size: clamp(1rem, 1.4vw, 1.18rem);
       line-height: 1.38;
       margin: 0;
       max-width: 650px;
     }
 
+    .glass-search {
+      align-items: center;
+      background: var(--glass);
+      border: 1px solid rgba(255, 255, 255, 0.58);
+      border-radius: 8px;
+      box-shadow: var(--soft-shadow);
+      display: grid;
+      grid-template-columns: auto 1fr;
+      max-width: 640px;
+      min-height: 58px;
+      padding: 8px 14px;
+      backdrop-filter: blur(18px);
+    }
+
+    .glass-search span {
+      color: var(--muted);
+      font-size: 1.4rem;
+      line-height: 1;
+      padding: 0 10px 0 2px;
+    }
+
+    .search-input {
+      background: transparent;
+      border: 0;
+      color: var(--ink);
+      font-size: 1.04rem;
+      min-height: 42px;
+      outline: none;
+      width: 100%;
+    }
+
+    .search-input::placeholder {
+      color: var(--muted);
+    }
+
+    .stats-panel {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      padding: 24px clamp(28px, 5vw, 54px) 0;
+    }
+
+    .stat-card {
+      background: var(--glass);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.55) inset;
+      padding: 14px 16px;
+      backdrop-filter: blur(16px);
+    }
+
+    .stat-card span {
+      color: var(--muted);
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 800;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+
+    .stat-card strong {
+      display: block;
+      font-size: clamp(1.18rem, 2vw, 1.65rem);
+      line-height: 1.08;
+    }
+
     .subject-grid {
       display: grid;
       gap: 22px;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      padding: 34px clamp(34px, 5vw, 54px) 48px;
+      padding: 26px clamp(28px, 5vw, 54px) 34px;
     }
 
     .subject-card {
@@ -239,14 +340,14 @@
       border: 1px solid var(--line);
       border-radius: 8px;
       box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset;
-      color: var(--ink);
+      color: #08090b;
       cursor: pointer;
-      min-height: 286px;
+      min-height: 304px;
       overflow: hidden;
-      padding: 26px 22px 22px;
+      padding: 24px 22px 22px;
       position: relative;
       text-align: left;
-      transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+      transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease, opacity 220ms ease;
     }
 
     .subject-card:hover,
@@ -257,11 +358,58 @@
       transform: translateY(-2px);
     }
 
+    .subject-card.is-opening {
+      animation: cardOpen 360ms ease forwards;
+      z-index: 2;
+    }
+
+    .progress-ring {
+      align-items: center;
+      background: rgba(255, 255, 255, 0.68);
+      border: 1px solid rgba(255, 255, 255, 0.68);
+      border-radius: 999px;
+      display: grid;
+      height: 56px;
+      justify-items: center;
+      position: absolute;
+      right: 14px;
+      top: 14px;
+      width: 56px;
+    }
+
+    .progress-ring svg {
+      height: 46px;
+      transform: rotate(-90deg);
+      width: 46px;
+    }
+
+    .progress-ring circle {
+      fill: none;
+      stroke-width: 5;
+    }
+
+    .progress-ring .track {
+      stroke: rgba(8, 9, 11, 0.12);
+    }
+
+    .progress-ring .value {
+      stroke: var(--tone);
+      stroke-dasharray: var(--progress) 100;
+      stroke-linecap: round;
+    }
+
+    .progress-ring span {
+      font-size: 0.7rem;
+      font-weight: 900;
+      position: absolute;
+    }
+
     .subject-art {
       align-items: center;
       display: flex;
       gap: 18px;
       min-height: 84px;
+      padding-right: 58px;
     }
 
     .subject-icon {
@@ -273,6 +421,20 @@
       stroke-linejoin: round;
       stroke-width: 1.8;
       width: 74px;
+    }
+
+    .subject-card:hover .book-left {
+      transform-origin: 30px 32px;
+      animation: pageFlip 980ms ease-in-out infinite;
+    }
+
+    .subject-card:hover .globe {
+      transform-origin: 29px 27px;
+      animation: globeTurn 1500ms linear infinite;
+    }
+
+    .subject-card:hover .history-column {
+      animation: columnRise 900ms ease-in-out infinite alternate;
     }
 
     .subject-card strong {
@@ -311,6 +473,103 @@
       padding: 18px 0;
     }
 
+    .mockup-section {
+      padding: 2px clamp(28px, 5vw, 54px) 56px;
+    }
+
+    .desktop-preview {
+      margin: 0 auto;
+      max-width: 780px;
+    }
+
+    .monitor {
+      background: #0a0a0b;
+      border-radius: 28px 28px 8px 8px;
+      box-shadow: var(--shadow);
+      padding: 18px 18px 26px;
+    }
+
+    .monitor-screen {
+      background: #ffffff;
+      border-radius: 4px;
+      min-height: 280px;
+      overflow: hidden;
+    }
+
+    .preview-top {
+      align-items: center;
+      border-bottom: 1px solid #e4e7eb;
+      display: flex;
+      gap: 16px;
+      min-height: 36px;
+      padding: 8px 22px;
+    }
+
+    .preview-search {
+      background: #ffffff;
+      border: 1px solid #d8dde5;
+      border-radius: 7px;
+      height: 24px;
+      width: 148px;
+    }
+
+    .preview-hero {
+      background: linear-gradient(90deg, #ffffff, #eff7f8);
+      padding: 34px 54px 24px;
+    }
+
+    .preview-hero strong {
+      display: block;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 0.95;
+      margin-bottom: 10px;
+    }
+
+    .preview-hero span {
+      display: block;
+      max-width: 430px;
+    }
+
+    .preview-cards {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      padding: 20px 54px 32px;
+    }
+
+    .preview-card {
+      border: 1px solid #c7d2dd;
+      border-radius: 8px;
+      min-height: 110px;
+    }
+
+    .preview-card:nth-child(1) {
+      background: #e2f3f0;
+    }
+
+    .preview-card:nth-child(2) {
+      background: #e5f1fb;
+    }
+
+    .preview-card:nth-child(3) {
+      background: #f4e8e3;
+    }
+
+    .monitor-stand {
+      background: linear-gradient(90deg, #c7ccd1, #f1f3f4, #b8bec5);
+      height: 70px;
+      margin: 0 auto;
+      width: 130px;
+    }
+
+    .monitor-foot {
+      background: linear-gradient(90deg, #bfc5cb, #f6f7f8, #b3bac2);
+      border-radius: 999px 999px 18px 18px;
+      height: 22px;
+      margin: 0 auto;
+      width: 260px;
+    }
+
     .frame-wrap {
       display: none;
       padding: 0;
@@ -343,10 +602,14 @@
     }
 
     .is-viewing .browser-top {
-      grid-template-columns: auto auto minmax(140px, 240px) 1fr auto;
+      grid-template-columns: auto auto 1fr auto auto;
       min-height: 48px;
       padding-bottom: 7px;
       padding-top: 7px;
+    }
+
+    .is-viewing .focus-button {
+      display: inline-flex;
     }
 
     .is-viewing .landing {
@@ -357,7 +620,79 @@
       display: block;
     }
 
-    @media (max-width: 880px) {
+    .focus-mode {
+      padding: 0;
+    }
+
+    .focus-mode .browser-window {
+      border-radius: 0;
+      border-width: 0;
+      max-width: none;
+      min-height: 100vh;
+    }
+
+    .focus-mode .browser-top {
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+      transform: translateY(-100%);
+    }
+
+    .focus-mode .site-frame {
+      height: 100vh;
+      min-height: 100vh;
+    }
+
+    .focus-mode .focus-exit {
+      display: inline-flex;
+    }
+
+    @keyframes cardOpen {
+      0% {
+        transform: translateY(-2px) scale(1);
+      }
+      55% {
+        transform: translateY(-8px) scale(1.035);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-14px) scale(1.08);
+      }
+    }
+
+    @keyframes pageFlip {
+      0%,
+      100% {
+        transform: skewY(0deg);
+      }
+      50% {
+        transform: skewY(-8deg) translateX(2px);
+      }
+    }
+
+    @keyframes globeTurn {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes columnRise {
+      to {
+        transform: translateY(-4px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 1ms !important;
+        scroll-behavior: auto !important;
+        transition-duration: 1ms !important;
+      }
+    }
+
+    @media (max-width: 920px) {
       .app-shell {
         padding: 10px;
       }
@@ -372,30 +707,50 @@
         display: none;
       }
 
-      .search-wrap {
-        grid-column: 1 / -1;
-      }
-
-      .mini-menu {
+      .mini-menu,
+      .top-tools {
         grid-column: 1 / -1;
         justify-self: stretch;
       }
 
-      .mini-menu button {
+      .mini-menu button,
+      .top-tools button {
         flex: 1;
       }
 
       .hero {
-        padding: 38px 24px 34px;
+        padding: 38px 24px 30px;
       }
 
+      .stats-panel,
       .subject-grid {
         grid-template-columns: 1fr;
-        padding: 24px;
+        padding-left: 24px;
+        padding-right: 24px;
       }
 
       .subject-card {
-        min-height: 230px;
+        min-height: 250px;
+      }
+
+      .mockup-section {
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+
+      .monitor {
+        border-radius: 18px 18px 8px 8px;
+        padding: 10px 10px 16px;
+      }
+
+      .preview-hero,
+      .preview-cards {
+        padding-left: 22px;
+        padding-right: 22px;
+      }
+
+      .preview-cards {
+        grid-template-columns: 1fr;
       }
 
       .site-frame {
@@ -415,29 +770,55 @@
           <span class="window-dot"></span>
         </div>
         <button class="home-link" type="button" id="homeButton">Kezdőlap</button>
-        <label class="search-wrap" aria-label="Keresés">
-          <input class="search-input" id="searchInput" type="search" placeholder="Keresés">
-        </label>
         <nav class="mini-menu" aria-label="Tételtárak">
           <button type="button" data-page="magyar" style="--tone:#2d8f83">Magyar</button>
           <button type="button" data-page="foldrajz" style="--tone:#2d77a8">Földrajz</button>
           <button type="button" data-page="tortenelem" style="--tone:#9d4b3e">Történelem</button>
         </nav>
+        <div class="top-tools">
+          <button class="utility-button" type="button" id="themeButton">Téma</button>
+          <button class="utility-button focus-button" type="button" id="focusButton">Fókusz</button>
+        </div>
         <div class="active-badge" id="activeBadge">Válassz tételtárat</div>
       </header>
 
       <main>
         <section class="landing" id="landing" aria-labelledby="landingTitle">
           <div class="hero">
-            <h1 id="landingTitle">Érettségi tételtárak</h1>
-            <p>Magyar, földrajz és történelem egy rendezett, gyorsan böngészhető tanulási felületen.</p>
+            <div class="hero-copy">
+              <h1 id="landingTitle">Érettségi tételtárak</h1>
+              <p>Magyar, földrajz és történelem egy rendezett, gyorsan böngészhető tanulási felületen.</p>
+            </div>
+            <label class="glass-search" aria-label="Keresés">
+              <span aria-hidden="true">⌕</span>
+              <input class="search-input" id="searchInput" type="search" placeholder="Mit tanulnál ma?">
+            </label>
+          </div>
+
+          <div class="stats-panel" aria-label="Tanulási statisztikák">
+            <div class="stat-card">
+              <span>Ma átnézve</span>
+              <strong>3 tétel</strong>
+            </div>
+            <div class="stat-card">
+              <span>Összes kedvenc</span>
+              <strong>7 mentve</strong>
+            </div>
+            <div class="stat-card">
+              <span>Legutóbbi</span>
+              <strong id="lastSubject">Még nincs</strong>
+            </div>
           </div>
 
           <div class="subject-grid" aria-label="Tantárgy választás">
-            <button class="subject-card" type="button" data-page="magyar" data-search="magyar irodalom nyelvtan" style="--tone:#2d8f83;--wash:#e2f3f0">
+            <button class="subject-card" type="button" data-page="magyar" data-search="magyar irodalom nyelvtan" style="--tone:#2d8f83;--wash:#e2f3f0;--progress:60">
+              <span class="progress-ring" aria-label="60 százalék haladás">
+                <svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="15.9"></circle><circle class="value" cx="18" cy="18" r="15.9"></circle></svg>
+                <span>12/20</span>
+              </span>
               <div class="subject-art" aria-hidden="true">
                 <svg class="subject-icon" viewBox="0 0 64 64">
-                  <path d="M9 14c8 0 15 2 21 7v32c-6-5-13-7-21-7V14Z" fill="none"></path>
+                  <path class="book-left" d="M9 14c8 0 15 2 21 7v32c-6-5-13-7-21-7V14Z" fill="none"></path>
                   <path d="M55 14c-8 0-15 2-21 7v32c6-5 13-7 21-7V14Z" fill="none"></path>
                   <path d="M16 22c4 .3 7 1.1 10 3M16 30c4 .3 7 1.1 10 3M38 25c3-1.6 6-2.5 10-3M38 33c3-1.6 6-2.5 10-3"></path>
                 </svg>
@@ -451,11 +832,18 @@
               <span class="open-pill">Megnyitás</span>
             </button>
 
-            <button class="subject-card" type="button" data-page="foldrajz" data-search="foldrajz földrajz természet társadalom térkép" style="--tone:#2d77a8;--wash:#e5f1fb">
+            <button class="subject-card" type="button" data-page="foldrajz" data-search="foldrajz földrajz természet társadalom térkép" style="--tone:#2d77a8;--wash:#e5f1fb;--progress:40">
+              <span class="progress-ring" aria-label="40 százalék haladás">
+                <svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="15.9"></circle><circle class="value" cx="18" cy="18" r="15.9"></circle></svg>
+                <span>8/20</span>
+              </span>
               <div class="subject-art" aria-hidden="true">
                 <svg class="subject-icon" viewBox="0 0 64 64">
-                  <circle cx="29" cy="27" r="18" fill="none"></circle>
-                  <path d="M17 18c6 1 8 4 8 8 0 3 5 3 7 6 2 3-1 7 2 10M36 12c-2 4 2 5 5 7 4 3 1 8 6 10M29 45v9M19 54h20"></path>
+                  <g class="globe">
+                    <circle cx="29" cy="27" r="18" fill="none"></circle>
+                    <path d="M17 18c6 1 8 4 8 8 0 3 5 3 7 6 2 3-1 7 2 10M36 12c-2 4 2 5 5 7 4 3 1 8 6 10"></path>
+                  </g>
+                  <path d="M29 45v9M19 54h20"></path>
                 </svg>
                 <svg class="subject-icon" viewBox="0 0 64 64">
                   <path d="M8 17l15-6 18 6 15-6v36l-15 6-18-6-15 6V17Z" fill="none"></path>
@@ -467,11 +855,17 @@
               <span class="open-pill">Megnyitás</span>
             </button>
 
-            <button class="subject-card" type="button" data-page="tortenelem" data-search="tortenelem történelem korszak esemény fogalom" style="--tone:#9d4b3e;--wash:#f4e8e3">
+            <button class="subject-card" type="button" data-page="tortenelem" data-search="tortenelem történelem korszak esemény fogalom" style="--tone:#9d4b3e;--wash:#f4e8e3;--progress:75">
+              <span class="progress-ring" aria-label="75 százalék haladás">
+                <svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="15.9"></circle><circle class="value" cx="18" cy="18" r="15.9"></circle></svg>
+                <span>15/20</span>
+              </span>
               <div class="subject-art" aria-hidden="true">
                 <svg class="subject-icon" viewBox="0 0 64 64">
-                  <path d="M12 52h40M16 46h32M20 24h24M16 20l16-9 16 9H16Z" fill="none"></path>
-                  <path d="M21 24v22M31 24v22M43 24v22M32 8v-4M32 4h8"></path>
+                  <g class="history-column">
+                    <path d="M12 52h40M16 46h32M20 24h24M16 20l16-9 16 9H16Z" fill="none"></path>
+                    <path d="M21 24v22M31 24v22M43 24v22M32 8v-4M32 4h8"></path>
+                  </g>
                 </svg>
                 <svg class="subject-icon" viewBox="0 0 64 64">
                   <circle cx="32" cy="21" r="10" fill="none"></circle>
@@ -485,6 +879,30 @@
 
             <div class="empty-state" id="emptyState">Nincs találat erre a keresésre.</div>
           </div>
+
+          <section class="mockup-section" aria-label="Előnézet">
+            <div class="desktop-preview">
+              <div class="monitor">
+                <div class="monitor-screen">
+                  <div class="preview-top">
+                    <strong>Kezdőlap</strong>
+                    <span class="preview-search"></span>
+                  </div>
+                  <div class="preview-hero">
+                    <strong>Érettségi tételtárak</strong>
+                    <span>Gyors választás, kompakt olvasómód és tanulási statisztikák.</span>
+                  </div>
+                  <div class="preview-cards">
+                    <span class="preview-card"></span>
+                    <span class="preview-card"></span>
+                    <span class="preview-card"></span>
+                  </div>
+                </div>
+              </div>
+              <div class="monitor-stand"></div>
+              <div class="monitor-foot"></div>
+            </div>
+          </section>
         </section>
 
         <section class="frame-wrap" aria-labelledby="currentTitle">
@@ -493,20 +911,24 @@
         </section>
       </main>
     </div>
+    <button class="focus-exit" type="button" id="focusExitButton">Kilépés fókuszból</button>
   </div>
 
   <script>
     const pages = {
       magyar: {
         title: "Magyar tételtár",
+        shortTitle: "Magyar",
         src: "pages/magyar.html"
       },
       foldrajz: {
         title: "Földrajz tételtár",
+        shortTitle: "Földrajz",
         src: "pages/foldrajz.html"
       },
       tortenelem: {
         title: "Történelem tételtár",
+        shortTitle: "Történelem",
         src: "pages/tortenelem.html"
       }
     };
@@ -515,18 +937,50 @@
     const frame = document.querySelector("#siteFrame");
     const title = document.querySelector("#currentTitle");
     const activeBadge = document.querySelector("#activeBadge");
-    const buttons = [...document.querySelectorAll("[data-page]")];
+    const navButtons = [...document.querySelectorAll(".mini-menu [data-page]")];
     const cards = [...document.querySelectorAll(".subject-card")];
     const homeButton = document.querySelector("#homeButton");
     const searchInput = document.querySelector("#searchInput");
     const emptyState = document.querySelector("#emptyState");
+    const themeButton = document.querySelector("#themeButton");
+    const focusButton = document.querySelector("#focusButton");
+    const focusExitButton = document.querySelector("#focusExitButton");
+    const lastSubject = document.querySelector("#lastSubject");
+
+    function preferredTheme() {
+      const savedTheme = localStorage.getItem("teteltar-theme");
+
+      if (savedTheme) {
+        return savedTheme;
+      }
+
+      const hour = new Date().getHours();
+      return hour >= 19 || hour < 6 ? "dark" : "light";
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.dataset.theme = theme;
+      themeButton.textContent = theme === "dark" ? "Világos mód" : "Esti mód";
+      localStorage.setItem("teteltar-theme", theme);
+    }
+
+    function setLastSubject(pageKey) {
+      localStorage.setItem("teteltar-last-subject", pageKey);
+      lastSubject.textContent = pages[pageKey]?.shortTitle || "Még nincs";
+    }
+
+    function hydrateStats() {
+      const storedLast = localStorage.getItem("teteltar-last-subject");
+      lastSubject.textContent = pages[storedLast]?.shortTitle || "Még nincs";
+    }
 
     function showLanding(updateHash = true) {
-      appShell.classList.remove("is-viewing");
+      appShell.classList.remove("is-viewing", "focus-mode");
       activeBadge.textContent = "Válassz tételtárat";
+      focusButton.textContent = "Fókusz";
       title.textContent = "Tételtár";
       frame.removeAttribute("src");
-      buttons.forEach((button) => button.setAttribute("aria-current", "false"));
+      navButtons.forEach((button) => button.setAttribute("aria-current", "false"));
 
       if (updateHash && window.location.hash) {
         history.replaceState(null, "", window.location.pathname + window.location.search);
@@ -546,8 +1000,9 @@
       frame.title = page.title;
       title.textContent = page.title;
       activeBadge.textContent = page.title;
+      setLastSubject(pageKey);
 
-      buttons.forEach((button) => {
+      navButtons.forEach((button) => {
         const isActive = button.dataset.page === pageKey;
         button.setAttribute("aria-current", isActive ? "page" : "false");
       });
@@ -555,6 +1010,15 @@
       if (updateHash && window.location.hash.slice(1) !== pageKey) {
         history.replaceState(null, "", `#${pageKey}`);
       }
+    }
+
+    function openWithAnimation(card) {
+      const pageKey = card.dataset.page;
+      card.classList.add("is-opening");
+      window.setTimeout(() => {
+        card.classList.remove("is-opening");
+        selectPage(pageKey);
+      }, 280);
     }
 
     function filterCards() {
@@ -571,17 +1035,48 @@
       emptyState.style.display = visibleCount ? "none" : "block";
     }
 
-    buttons.forEach((button) => {
-      button.addEventListener("click", () => selectPage(button.dataset.page));
+    navButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const matchingCard = cards.find((card) => card.dataset.page === button.dataset.page);
+        if (matchingCard && !appShell.classList.contains("is-viewing")) {
+          openWithAnimation(matchingCard);
+          return;
+        }
+        selectPage(button.dataset.page);
+      });
+    });
+
+    cards.forEach((card) => {
+      card.addEventListener("click", () => openWithAnimation(card));
     });
 
     homeButton.addEventListener("click", () => showLanding());
     searchInput.addEventListener("input", filterCards);
+    themeButton.addEventListener("click", () => {
+      applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+    });
+    focusButton.addEventListener("click", () => {
+      appShell.classList.toggle("focus-mode");
+      focusButton.textContent = appShell.classList.contains("focus-mode") ? "Kilépés" : "Fókusz";
+    });
+    focusExitButton.addEventListener("click", () => {
+      appShell.classList.remove("focus-mode");
+      focusButton.textContent = "Fókusz";
+    });
+
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && appShell.classList.contains("focus-mode")) {
+        appShell.classList.remove("focus-mode");
+        focusButton.textContent = "Fókusz";
+      }
+    });
 
     window.addEventListener("hashchange", () => {
       selectPage(window.location.hash.slice(1), false);
     });
 
+    applyTheme(preferredTheme());
+    hydrateStats();
     selectPage(window.location.hash.slice(1), false);
   </script>
 </body>
